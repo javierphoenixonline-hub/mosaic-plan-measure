@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mosaic Plan Measure</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- ===== UPLOAD SCREEN ===== -->
+<div id="upload-screen">
+  <div class="upload-card">
+    <div class="brand">Mosaic Plan Measure</div>
+    <p class="brand-sub">The Mosaic Company of Louisiana</p>
+
+    <div class="section-label">Job Information</div>
+    <div class="form-grid">
+      <input type="text" id="job-client"    placeholder="Client Name" />
+      <input type="text" id="job-address"   placeholder="Job Address" />
+      <input type="text" id="job-num"       placeholder="Job #" />
+      <input type="text" id="job-estimator" placeholder="Estimator" />
+    </div>
+
+    <div class="section-label" style="margin-top:20px;">Plan Scale</div>
+    <select id="scale-select" class="full-select">
+      <option value="1">1" = 1'</option>
+      <option value="1.333">3/4" = 1'</option>
+      <option value="2">1/2" = 1'</option>
+      <option value="2.667">3/8" = 1'</option>
+      <option value="4" selected>1/4" = 1'</option>
+      <option value="5.333">3/16" = 1'</option>
+      <option value="8">1/8" = 1'</option>
+      <option value="10.667">3/32" = 1'</option>
+      <option value="16">1/16" = 1'</option>
+      <option value="32">1/32" = 1'</option>
+    </select>
+
+    <label class="upload-dropzone" id="upload-dropzone">
+      <input type="file" id="pdf-input" accept=".pdf" hidden />
+      <div class="upload-icon">&#8679;</div>
+      <div class="upload-label">Drop PDF here or click to upload</div>
+      <div class="upload-sub">28" or 36" architectural plans supported</div>
+    </label>
+
+    <div class="divider">or</div>
+
+    <label class="btn-secondary full-btn">
+      Load Saved Session (.json)
+      <input type="file" id="load-input" accept=".json" hidden />
+    </label>
+  </div>
+</div>
+
+<!-- ===== EDITOR SCREEN ===== -->
+<div id="editor-screen" class="hidden">
+
+  <div id="toolbar">
+    <div class="tb-left">
+      <span class="tb-brand">Mosaic</span>
+
+      <div class="tb-group">
+        <label class="tb-label">Material</label>
+        <div class="material-picker">
+          <div id="material-swatch" class="mat-swatch"></div>
+          <select id="material-select">
+            <optgroup label="── Floor ──">
+              <option value="lvp-floating">LVP Floating</option>
+              <option value="wood">Wood</option>
+              <option value="tile">Tile</option>
+              <option value="carpet">Carpet</option>
+              <option value="sheet-vinyl">Sheet Vinyl</option>
+              <option value="glue-down">Glue Down</option>
+              <option value="laminate">Laminate</option>
+            </optgroup>
+            <optgroup label="── Wall / Special ──">
+              <option value="backsplash">Backsplash</option>
+              <option value="tub-surround">Tub Surround</option>
+              <option value="shower-floor">Shower Floor</option>
+              <option value="shower-walls">Shower Walls</option>
+              <option value="fireplace">Fireplace</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+
+      <div class="tb-group">
+        <label class="tb-label">Scale</label>
+        <span id="scale-display" class="tb-value">1/4" = 1'</span>
+      </div>
+    </div>
+
+    <div class="tb-right">
+      <div class="tb-group">
+        <label class="tb-label">Sheet</label>
+        <select id="sheet-select"></select>
+        <button id="add-sheet-btn" class="tb-icon-btn" title="Add Sheet">+</button>
+      </div>
+
+      <div class="tb-group">
+        <button id="zoom-out-btn" class="tb-icon-btn">−</button>
+        <span id="zoom-display" class="tb-value">30%</span>
+        <button id="zoom-in-btn" class="tb-icon-btn">+</button>
+        <button id="zoom-fit-btn" class="tb-btn">Fit</button>
+      </div>
+
+      <div class="tb-group">
+        <button id="pan-mode-btn" class="tb-btn" title="Pan mode — hold Space or click here, then drag">Pan</button>
+        <button id="pan-up-btn"    class="tb-icon-btn" title="Scroll up">↑</button>
+        <button id="pan-down-btn"  class="tb-icon-btn" title="Scroll down">↓</button>
+        <button id="pan-left-btn"  class="tb-icon-btn" title="Scroll left">←</button>
+        <button id="pan-right-btn" class="tb-icon-btn" title="Scroll right">→</button>
+      </div>
+
+      <div class="tb-group">
+        <button id="snap-grid-btn" class="tb-btn active" title="Grid Snap (6&quot; increments)">Grid</button>
+        <button id="snap-point-btn" class="tb-btn active" title="Snap to existing points">Pts</button>
+      </div>
+
+      <button id="undo-btn" class="tb-btn">Undo</button>
+      <button id="save-btn" class="tb-btn">Save</button>
+      <button id="print-btn" class="tb-btn primary">Print</button>
+    </div>
+  </div>
+
+  <div id="workspace">
+    <div id="canvas-wrapper">
+      <div id="canvas-container">
+        <canvas id="pdf-canvas"></canvas>
+        <canvas id="overlay-canvas"></canvas>
+        <div id="snap-dot" class="snap-dot hidden"></div>
+      </div>
+    </div>
+
+    <div id="sidebar">
+      <div class="sidebar-hdr">
+        <span>Areas</span>
+        <span id="area-count" class="sidebar-count">0</span>
+      </div>
+      <div id="area-list"></div>
+      <div id="totals-panel"></div>
+    </div>
+  </div>
+
+  <div id="status-bar">
+    <span id="status-msg">Select a material, then click on the plan to start tracing an area.</span>
+    <span id="status-coords" class="status-right"></span>
+  </div>
+</div>
+
+<!-- ===== PRINT VIEW ===== -->
+<div id="print-view" class="hidden">
+  <div id="pv-header"></div>
+  <div id="pv-body">
+    <div id="pv-plan">
+      <canvas id="print-pdf-canvas"></canvas>
+      <canvas id="print-overlay-canvas"></canvas>
+      <!-- Table overlays top-left of the plan -->
+      <div id="pv-table"></div>
+    </div>
+  </div>
+  <div id="pv-footer"></div>
+</div>
+
+<!-- ===== WALL HEIGHT MODAL ===== -->
+<div id="height-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-title" id="height-modal-title">Wall Height</div>
+    <div class="modal-desc" id="height-modal-desc">Enter the height of this wall surface.</div>
+    <div class="modal-inputs">
+      <div class="input-group">
+        <input type="number" id="height-ft" min="0" max="30" placeholder="0" />
+        <span class="input-unit">ft</span>
+      </div>
+      <div class="input-group">
+        <input type="number" id="height-in" min="0" max="11" placeholder="0" />
+        <span class="input-unit">in</span>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button id="height-cancel" class="tb-btn">Cancel</button>
+      <button id="height-confirm" class="tb-btn primary">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== AREA NAME MODAL ===== -->
+<div id="name-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-title">Name This Area</div>
+    <div class="modal-desc">Give this area a label for the measurement table.</div>
+    <input type="text" id="area-name-input" placeholder="e.g. Living Room, Master Bath, Kitchen" class="modal-text-input" />
+    <div class="modal-btns">
+      <button id="name-cancel" class="tb-btn">Cancel</button>
+      <button id="name-confirm" class="tb-btn primary">Add Area</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+</script>
+<script src="js/app.js"></script>
+</body>
+</html>
