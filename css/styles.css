@@ -262,10 +262,7 @@ input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1p
 
   * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
-  #pv-header {
-    padding: 5px 10px; border-bottom: 1.5px solid #333;
-    display: flex; justify-content: space-between; align-items: flex-start;
-  }
+  #pv-header, #pv-footer { display: none !important; }
 
   #pv-body { display: block; }
 
@@ -294,6 +291,8 @@ input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1p
     font-size: 7pt;
     z-index: 10;
     border-radius: 2px;
+    transform: scale(1.2);
+    transform-origin: top left;
   }
 
   #pv-footer {
