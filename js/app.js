@@ -12,17 +12,17 @@ const PRINT_DPI = 96;
 
 const MATERIALS = {
   'lvp-floating':  { name: 'LVP Floating', color: '#534AB7', waste: 0.10, type: 'floor' },
-  'wood':          { name: 'Wood',          color: '#7B4A1E', waste: 0.10, type: 'floor' },
-  'tile':          { name: 'Tile',          color: '#1D9E75', waste: 0.10, type: 'floor' },
-  'carpet':        { name: 'Carpet',        color: '#BA7517', waste: 0.10, type: 'floor' },
-  'sheet-vinyl':   { name: 'Sheet Vinyl',   color: '#378ADD', waste: 0.10, type: 'floor' },
+  'wood':          { name: 'Wood',          color: '#7B2FB5', waste: 0.10, type: 'floor' },
+  'tile':          { name: 'Tile',          color: '#1E9E3A', waste: 0.10, type: 'floor' },
+  'carpet':        { name: 'Carpet',        color: '#E8820C', waste: 0.10, type: 'floor' },
+  'sheet-vinyl':   { name: 'Sheet Vinyl',   color: '#1565D8', waste: 0.10, type: 'floor' },
   'glue-down':     { name: 'Glue Down',     color: '#888780', waste: 0.10, type: 'floor' },
-  'laminate':      { name: 'Laminate',      color: '#639922', waste: 0.10, type: 'floor' },
+  'laminate':      { name: 'Laminate',      color: '#D9A800', waste: 0.10, type: 'floor' },
   'backsplash':    { name: 'Backsplash',    color: '#D4537E', waste: 0.15, type: 'wall',
                      heightMode: 'fixed', fixedHeight: 1.5 },
   'tub-surround':  { name: 'Tub Surround',  color: '#0F6E56', waste: 0.15, type: 'wall',
                      heightMode: 'prompt' },
-  'shower-floor':  { name: 'Shower Floor',  color: '#185FA5', waste: 0.15, type: 'floor' },
+  'shower-floor':  { name: 'Shower Floor',  color: '#D32020', waste: 0.15, type: 'floor' },
   'shower-walls':  { name: 'Shower Walls',  color: '#5DCAA5', waste: 0.15, type: 'wall',
                      heightMode: 'prompt' },
   'fireplace':     { name: 'Fireplace',     color: '#E24B4A', waste: 0.10, type: 'wall',
@@ -353,19 +353,19 @@ function drawArea(ctx, area, forPrint) {
 
   // Label in centroid
   const ctr = centroid(pts);
-  const fontSize = Math.max(forPrint ? 8 : 11, Math.min(forPrint ? 11 : 14, pixelsPerFoot() * 0.6));
+  const fontSize = Math.max(forPrint ? 9.6 : 13.2, Math.min(forPrint ? 13.2 : 16.8, pixelsPerFoot() * 0.72));
 
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
   // Dimension line 1
-  ctx.font = `500 ${fontSize}px monospace`;
-  ctx.fillStyle = darken(mat.color, 0.3);
+  ctx.font = `bold ${fontSize}px monospace`;
+  ctx.fillStyle = '#D32020';
   ctx.fillText(area.dimLabel1, ctr.x, ctr.y - fontSize * 0.7);
 
   // SF line
-  ctx.font = `${fontSize * 0.9}px monospace`;
-  ctx.fillStyle = mat.color;
+  ctx.font = `bold ${fontSize * 0.9}px monospace`;
+  ctx.fillStyle = '#D32020';
   ctx.fillText(area.sfLabel, ctr.x, ctr.y + fontSize * 0.5);
 }
 
@@ -1148,40 +1148,8 @@ async function preparePrint() {
   printOvCtx.clearRect(0, 0, printOverlayCanvas.width, printOverlayCanvas.height);
   areas.forEach(area => drawArea(printOvCtx, area, true));
 
-  // Build header
-  const j = state.job;
-  $('pv-header').innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-      <div>
-        <div style="font-size:11pt;font-weight:700;">The Mosaic Company of Louisiana</div>
-        <div style="font-size:9pt;color:#444;margin-top:2px;">Floor Plan &amp; Material Takeoff</div>
-      </div>
-      <div style="text-align:right;font-size:8pt;color:#555;">
-        <div><strong>Client:</strong> ${j.client || '—'}</div>
-        <div><strong>Address:</strong> ${j.address || '—'}</div>
-        <div><strong>Job #:</strong> ${j.num || '—'} &nbsp; <strong>By:</strong> ${j.estimator || '—'}</div>
-        <div><strong>Scale:</strong> ${state.scaleLabel} &nbsp; <strong>Date:</strong> ${j.date || '—'}</div>
-      </div>
-    </div>
-  `;
-
   // Build table
   renderTotals($('pv-table'), areas, true);
-
-  // Build footer — legend
-  const legendHtml = Object.entries(MATERIALS)
-    .filter(([key]) => areas.some(a => a.material === key))
-    .map(([key, mat]) =>
-      `<span style="display:inline-flex;align-items:center;gap:3px;margin-right:10px;">
-        <span style="width:8px;height:8px;border-radius:2px;background:${mat.color};display:inline-block;"></span>
-        ${mat.name}
-      </span>`
-    ).join('');
-
-  $('pv-footer').innerHTML = `
-    <div>${legendHtml}</div>
-    <div>Print at 100% scale — no fit to page — verify with architect's scale</div>
-  `;
 
   window.print();
 }
